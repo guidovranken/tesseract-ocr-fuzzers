@@ -94,6 +94,10 @@ static PIX* createPix(BitReader& BR, const size_t width, const size_t height) {
     return pix;
 }
 
+static void memory_test(const char* str) {
+    /* TODO call ASAN/MSAN callbacks to validate region */
+}
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     BitReader BR(data, size);
@@ -102,10 +106,20 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 
     api->SetImage(pix);
 
-    char* outText = api->GetUTF8Text();
+    {
+        /* All of the following methods return 'char *' */
+        {auto out = api->GetUTF8Text(); memory_test(out); delete[] out;}
+        {auto out = api->GetUNLVText(); memory_test(out); delete[] out;}
+        {auto out = api->GetAltoText(0); memory_test(out); delete[] out;}
+        {auto out = api->GetBoxText(0); memory_test(out); delete[] out;}
+        {auto out = api->GetHOCRText(0); memory_test(out); delete[] out;}
+        {auto out = api->GetLSTMBoxText(0); memory_test(out); delete[] out;}
+        {auto out = api->GetOsdText(0); memory_test(out); delete[] out;}
+        {auto out = api->GetTSVText(0); memory_test(out); delete[] out;}
+        {auto out = api->GetWordStrBoxText(0); memory_test(out); delete[] out;}
+    }
 
     pixDestroy(&pix);
-    delete[] outText;
 
     return 0;
 }
