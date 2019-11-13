@@ -1,5 +1,5 @@
-#include "baseapi.h"
-#include "leptonica/allheaders.h"
+#include <leptonica/allheaders.h>
+#include <tesseract/baseapi.h>
 
 #include <stdint.h>
 #include <stddef.h>
